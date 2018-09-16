@@ -1,0 +1,25 @@
+header {
+  font-size: 16px;
+  color: red;
+  border: 1px solid red;
+}
+
+#btn{
+  height: 40px;
+  width: 100px;
+  line-height: 40px;
+  border: 1px solid #f60;
+  outline: none;
+  cursor: pointer;
+  border-radius: 3px;
+  background: #f60;
+  color: #fff;
+  margin-top: 20px;
+}
+
+p{
+  width: 100px;
+  height: 100px;
+  background: url('../img/4.jpg');
+  background-size: cover;
+}
