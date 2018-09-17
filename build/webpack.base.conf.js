@@ -2,10 +2,9 @@
  const path = require('path');
  const fs = require('fs');
  const config = require('./config');
-//  const webpack = require('webpack');
  const HtmlWebpackPlugin = require('html-webpack-plugin');  // 用于生成html
-//  const CleanWebpackPlugin = require('clean-webpack-plugin');
-//  const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+ const CleanWebpackPlugin = require('clean-webpack-plugin');
+ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // 获取所有html文件的集合，用于生成入口
 const getFileNameList = (path) => {
@@ -26,85 +25,114 @@ let HtmlPlugins = [];  // 保存HtmlWebpackPlugin实例
 let Entries = {};  // 保存入口列表
 htmlDirs.forEach(item => {
   let htmlConfig = {
-    filename: `${item}`,
+    filename:`./html/${item}.html`,
     template: path.join(config.htmlPath, `./${item}.html`),
     chunks: [item, 'default', 'vendors'],
-    minify: process.env.NODE_ENV === 'development' ? false : {
+    // minify: process.env.NODE_ENV === 'development' ? false : {
+    //   removeAttributeQuotes: true,  // 去除属性引用
+    //   collapseWhitespace: true, // 折叠空白区域
+    //   removeComments: true  // 移除html中的注释
+    // }
+    minify: {
       removeAttributeQuotes: true,  // 去除属性引用
-      collapseWhitespace: true, // 折叠空白区域
-      removeComments: true  // 移除html中的注释
+      // collapseWhitespace: true, // 折叠空白区域
+      // removeComments: true  // 移除html中的注释
     }
   }
   Entries[item] = config.jsPath + `${item}.js`
   HtmlPlugins.push(new HtmlWebpackPlugin(htmlConfig));
 })
 
- module.exports = {
+const devMode = process.env.NODE_ENV == 'production' ? true : false;
+
+function resolve(dir) {
+  return path.resolve(__dirname, '..', dir);
+}
+
+module.exports = {
+  mode: 'production',
   context: config.projectPath,  // 入口、插件路径会基于context查找
   entry: Entries,
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: 'js/[name].js'
+  },
   resolve: {
     extensions: ['.js', '.vue', '.css', '.json'],  // 自动补全文件的扩展名
     alias: {
       '@': resolve('src')
     }
-  }
-  //  context: path.resolve(__dirname, '..'),
-  //  entry: './src/js/index.js',
-  //  output: {
-  //    path: path.resolve(__dirname, '../dist'),
-  //    filename: 'js/[name].[chunkhash:8].js',
-  //  },
-  //  module: {
-  //    rules: [
-  //     {
-  //       test: /\.(sa|sc|le|c)ss$/,
-  //       // use: [
-  //       //   devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-  //       //   'css-loader'
-  //       // ],
-  //       use: [
-  //         {
-  //           loader: MiniCssExtractPlugin.loader,
-  //           options: {
-  //             publicPath: '../'
-  //           }
-  //         },
-  //         'css-loader'
-  //       ],
-  //       include: path.resolve(__dirname, '../src'),
-  //       exclude: /node_modules/
-  //     },
-  //     // 处理图片
-  //     {
-  //       test: /\.(png|jpg|gif|ttf|eot|woff(2)?)(\?[=a-z0-9]+)?$/,
-  //       use: [{
-  //         loader: 'url-loader',
-  //         options: {
-  //           limit: 8192,
-  //           name: 'images/[name].[hash:7].[ext]'         
-  //         }
-  //       }]
-  //     },
-  //     {
-  //       test: /\.(htm|html)$/,
-  //       use: 'html-loader'
-  //     }
-  //   ]
-  //  },
-  //  plugins: [
-    // new CleanWebpackPlugin(['dist'], {
-    //   root: path.resolve(__dirname, '../')
-    // }),
-    // new HtmlWebpackPlugin({
-    //   template: './src/html/index.html',
-    //   hash: true,
-    //   minify: {
-    //     removeAttributeQuotes: true
-    //   }
-    // }),
-    // new MiniCssExtractPlugin({
-    //   filename: devMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
-    //   chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[contenthash:8].css'
-    // })
-  // ]
- }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(sa|sc|le|c)ss$/,
+        // use: [
+        //   devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+        //   'css-loader'
+        // ],
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../'
+            }
+          },
+          'css-loader'
+        ],
+        include: path.resolve(__dirname, '../src'),
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        include: [config.srcPath],
+        exclude: [config.assetsSubDirectory],  // 忽略第三方的任何代码
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8192,
+            name: 'fonts/[name].[hash:7].[ext]',
+            fallback: 'file-loader'
+          }
+        }]
+      },
+      // 处理图片
+      {
+        test: /\.(png|jpg|gif|ttf|eot|woff(2)?)(\?[=a-z0-9]+)?$/,
+        include: [config.srcPath],  // 在源文件目录中查找
+        use: [{
+          loader: 'url-loader',
+          options: {
+            publicPath: '../',
+            limit: 8192,
+            name: 'images/[name].[hash:7].[ext]',
+            fallback: 'file-loader'  // 当图片大小超过8192时，回退使用file-loader
+          }
+        }]
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 8192,
+          name: 'media/[name].[hash:7].[ext]',
+          fallback: 'file-loader'
+        }
+      },
+      {
+        test: /\.(htm|html)$/,
+        use: 'html-loader'
+      }
+    ]
+  },
+  plugins: [
+    ...HtmlPlugins,
+    new CleanWebpackPlugin(['dist'], {
+      root: path.resolve(__dirname, '../')
+    }),
+    new MiniCssExtractPlugin({
+      filename: devMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
+      chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[contenthash:8].css'
+    })
+  ]
+}
