@@ -35,8 +35,8 @@ module.exports = merge(baseWebpackConfig, {
   },
   plugins: [ 
     new webpack.HotModuleReplacementPlugin(), // 启动热更新
-    // new webpack.NamedChunksPlugin(),
-    new webpack.NameModulesPlugin(),  // 开启HMR时显示模块的相对路径，建议用于开发环境
+    new webpack.NamedChunksPlugin(),
+    // new webpack.NameModulesPlugin(),  // 开启HMR时显示模块的相对路径，建议用于开发环境
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"development"'
