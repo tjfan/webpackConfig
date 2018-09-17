@@ -78,7 +78,9 @@ module.exports = {
               publicPath: '../'
             }
           },
-          'css-loader'
+          'css-loader',
+          'postcss-loader',
+          'less-loader'
         ],
         include: path.resolve(__dirname, '../src'),
         exclude: /node_modules/
