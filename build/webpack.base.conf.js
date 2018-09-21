@@ -3,7 +3,6 @@
  const fs = require('fs');
  const config = require('./config');
  const HtmlWebpackPlugin = require('html-webpack-plugin');  // 用于生成html
- const CleanWebpackPlugin = require('clean-webpack-plugin');
  const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // 获取所有html文件的集合，用于生成入口
@@ -48,15 +47,14 @@ const devMode = process.env.NODE_ENV == 'production' ? true : false;
 function resolve(dir) {
   return path.resolve(__dirname, '..', dir);
 }
-
 module.exports = {
   mode: 'production',
   context: config.projectPath,  // 入口、插件路径会基于context查找
   entry: Entries,
-  output: {
-    path: path.resolve(__dirname, '../dist'),
-    filename: 'js/[name].js'
-  },
+  // output: {
+  //   path: path.resolve(__dirname, '../dist'),
+  //   filename: 'js/[name].js'
+  // },
   resolve: {
     extensions: ['.js', '.vue', '.css', '.json'],  // 自动补全文件的扩展名
     alias: {
@@ -129,9 +127,6 @@ module.exports = {
   },
   plugins: [
     ...HtmlPlugins,
-    new CleanWebpackPlugin(['dist'], {
-      root: path.resolve(__dirname, '../')
-    }),
     new MiniCssExtractPlugin({
       filename: devMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
       chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[contenthash:8].css'
