@@ -42,13 +42,12 @@ htmlDirs.forEach(item => {
   HtmlPlugins.push(new HtmlWebpackPlugin(htmlConfig));
 })
 
-const devMode = process.env.NODE_ENV == 'production' ? true : false;
+// const devMode = process.env.NODE_ENV == 'production' ? true : false;
 
 function resolve(dir) {
   return path.resolve(__dirname, '..', dir);
 }
 module.exports = {
-  mode: 'production',
   context: config.projectPath,  // 入口、插件路径会基于context查找
   entry: Entries,
   // output: {
@@ -63,26 +62,26 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.(sa|sc|le|c)ss$/,
-        // use: [
-        //   devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-        //   'css-loader'
-        // ],
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: '../'
-            }
-          },
-          'css-loader',
-          'postcss-loader',
-          'less-loader'
-        ],
-        include: path.resolve(__dirname, '../src'),
-        exclude: /node_modules/
-      },
+      // {
+      //   test: /\.(sa|sc|le|c)ss$/,
+      //   // use: [
+      //   //   devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
+      //   //   'css-loader'
+      //   // ],
+      //   use: [
+      //     {
+      //       loader: MiniCssExtractPlugin.loader,
+      //       options: {
+      //         publicPath: '../'
+      //       }
+      //     },
+      //     'css-loader',
+      //     'postcss-loader',
+      //     'less-loader'
+      //   ],
+      //   include: path.resolve(__dirname, '../src'),
+      //   exclude: /node_modules/
+      // },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         include: [config.srcPath],
@@ -127,9 +126,9 @@ module.exports = {
   },
   plugins: [
     ...HtmlPlugins,
-    new MiniCssExtractPlugin({
-      filename: devMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
-      chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[contenthash:8].css'
-    })
+    // new MiniCssExtractPlugin({
+    //   filename: devMode ? 'css/[name].css' : 'css/[name].[contenthash:8].css',
+    //   chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[contenthash:8].css'
+    // })
   ]
 }
