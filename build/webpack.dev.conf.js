@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.base.conf');  // 引入基础配置
 const config = require('./config');
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 只在生产环境用就可以了
 
 
 module.exports = merge(baseWebpackConfig, {
@@ -33,10 +34,35 @@ module.exports = merge(baseWebpackConfig, {
     publicPath: config.dev.assetsPublicPath,
     proxy: config.dev.proxyTable
   },
+  module: {
+    rules: [
+      {
+        test: /\.(sa|sc|le|c)ss$/,
+        include: [config.srcPath],
+        exclude: /node_modules/,
+        use: [
+          // {
+          //   loader: 'style-loader',
+          //   options: {
+          //     publicPath: '../'
+          //   }
+          // },
+          'style-loader',
+          'css-loader',
+          // 'postcss-loader',  // 开发环境中如果自动添加前缀，可能影响性能。只在生产环境中添加即可
+          'less-loader'
+        ]
+      }
+    ]
+  },
   plugins: [ 
     new webpack.HotModuleReplacementPlugin(), // 启动热更新
     new webpack.NamedChunksPlugin(),
     // new webpack.NameModulesPlugin(),  // 开启HMR时显示模块的相对路径，建议用于开发环境
+    // new MiniCssExtractPlugin({
+    //   filename: 'css/[name].css',
+    //   chunkFilename: 'css/[id].css'
+    // }),
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"development"'
