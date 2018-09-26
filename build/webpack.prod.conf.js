@@ -9,8 +9,7 @@ const UgligyJSPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin'); // 拷贝文件
 const HappyPack = require('happypack');
-
-process.env.NODE_ENV = 'production'
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 const webpackConfig = merge(baseWebpackConfig, {
   mode: 'production',
@@ -22,7 +21,24 @@ const webpackConfig = merge(baseWebpackConfig, {
     chunkFilename: 'js/[id].[chunkhash:7].js'
   },
   module: {
-    rules: []
+    rules: [
+      {
+        test: /\.(sa|sc|le|c)ss$/,
+        include: [config.srcPath],
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../'
+            }
+          },
+          'css-loader',
+          'postcss-loader',
+          'less-loader'
+        ]
+      }
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -37,6 +53,20 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename: 'css/[name].[contenthash:8].css',
       chunkFilename: 'css/[id].[contenthash:8].css'
     }),
+    // 压缩提取出的css，并解决ExtractTextPlugin分离出的js重复问题(多个文件引入同一css文件)
+    new OptimizeCssAssetsPlugin({
+      assetNameRegExp: /\.css$/g,
+      // cssProcessor: require('cssnano'),
+      cssProcessorOptions: {
+        safe: true,
+        autoprofixer: {disable: true},
+        mergeLoghand: false,
+        discardComments: {
+          removeAll: true // 移除注释
+        }
+      },
+      canPrint: true
+    }),
     // 开启多个进程
     // new HappyPack({
     //   id: 'babel',
@@ -46,31 +76,70 @@ const webpackConfig = merge(baseWebpackConfig, {
     // 作用域提升
     new webpack.optimize.ModuleConcatenationPlugin(),
     // new webpack.DllPlugin({
-    //   path: path.resolve(__dirname, './dist/dll', 'manifest.json'),
-    // })
+    //   path: path.resolve(__dirname, '../dist/dll', 'manifest.json'),
+    // }),
+    // 根据模块的相对路径生成一个四位数的hash作为模块id，建议用于生产环境
+    // 当供应商模块不变时，保持module.id稳定
+    new webpack.HashedModuleIdsPlugin(),
+    // 复制静态资源
+    new CopyWebpackPlugin([
+      {
+        from: config.assetsSubDirectory,
+        to: './static',
+        ignore: ['.*']
+      }
+    ])
   ],
-  // 提取公共代码
-  // optimization: {
-  //   splitChunks: {
-  //     chunks: 'all',
-  //     cacheGroups: {
-  //       vendors: {
-  //         test: /[\\/]node_modules[\\/]/,
-  //         chunks: 'all',
-  //         name: 'vendors',
-  //       },
-  //       commons: {
-  //         chunks: "async",
-  //         name: "common-async",
-  //         minSize: 0,
-  //         minChunks: 2
-  //       }
-  //     }
-  //   }
-  // },
-  // runtimeChunk: {
-  //   name: "manifest"
-  // }
+  optimization: {
+    runtimeChunk: {
+      name: 'manifest'
+    },
+    minimizer: [
+      // 压缩js
+      new UgligyJSPlugin({
+        exclude: /\.min\.js$/,
+        cache: true,
+        parallel: true, //开启并行压缩
+        sourceMap: false,
+        extractComments: true, //删除注释
+        uglifyOptions: {
+          compress: {
+            unused: true, 
+            // warnning: false,
+            drop_debugger: true
+          },
+          output: {
+            beautify: false,  // 最紧凑的输出
+            comments: false
+          }
+        }
+      }),
+    ],
+    splitChunks: {
+      chunks: 'all',
+      name: true,
+      minSize: 2000,
+      minChunks: 1,
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      // automaticNameDelimiter: '~'
+      cacheGroups: {
+        vendor: {
+          name: 'vendor',
+          chunks: 'initial',
+          priority: -10,
+          reuseExistingChunk: false,
+          test: /node_modules\/(.*)\.js/
+        },
+        default: {
+          name: 'default',
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
 })
 
 module.exports = webpackConfig;
