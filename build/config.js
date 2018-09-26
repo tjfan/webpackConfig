@@ -29,7 +29,7 @@ const config = {
     prodSourceMap: false,
     devtool: 'source-map',
     assetsRoot: path.resolve(__dirname, '../dist'),  // 构建根目录
-    assetsPublicPath: '../'  // 相对于服务器根目录的路径，用于加载构建好的资源
+    assetsPublicPath: '/'  // 相对于服务器根目录的路径，用于加载构建好的资源
   }
 }
 
