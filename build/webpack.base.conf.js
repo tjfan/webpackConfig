@@ -3,7 +3,6 @@
  const fs = require('fs');
  const config = require('./config');
  const HtmlWebpackPlugin = require('html-webpack-plugin');  // 用于生成html
- const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // 获取所有html文件的集合，用于生成入口
 const getFileNameList = (path) => {
@@ -41,7 +40,6 @@ htmlDirs.forEach(item => {
   Entries[item] = config.jsPath + `${item}.js`
   HtmlPlugins.push(new HtmlWebpackPlugin(htmlConfig));
 })
-
 // const devMode = process.env.NODE_ENV == 'production' ? true : false;
 
 function resolve(dir) {
@@ -50,38 +48,22 @@ function resolve(dir) {
 module.exports = {
   context: config.projectPath,  // 入口、插件路径会基于context查找
   entry: Entries,
-  // output: {
-  //   path: path.resolve(__dirname, '../dist'),
-  //   filename: 'js/[name].js'
-  // },
   resolve: {
-    extensions: ['.js', '.vue', '.css', '.json'],  // 自动补全文件的扩展名
+    extensions: ['.js', '.css', '.json'],  // 自动补全文件的扩展名
     alias: {
       '@': resolve('src')
     }
   },
   module: {
     rules: [
-      // {
-      //   test: /\.(sa|sc|le|c)ss$/,
-      //   // use: [
-      //   //   devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
-      //   //   'css-loader'
-      //   // ],
-      //   use: [
-      //     {
-      //       loader: MiniCssExtractPlugin.loader,
-      //       options: {
-      //         publicPath: '../'
-      //       }
-      //     },
-      //     'css-loader',
-      //     'postcss-loader',
-      //     'less-loader'
-      //   ],
-      //   include: path.resolve(__dirname, '../src'),
-      //   exclude: /node_modules/
-      // },
+      {
+        test: /\.js?$/,
+        include: [config.srcPath],
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         include: [config.srcPath],
