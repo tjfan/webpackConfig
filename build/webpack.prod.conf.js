@@ -68,15 +68,18 @@ const webpackConfig = merge(baseWebpackConfig, {
       canPrint: true
     }),
     // 开启多个进程
-    // new HappyPack({
-    //   id: 'babel',
-    //   threads: 4,
-    //   loaders: ['loader-babel']
-    // }),
+    new HappyPack({
+      id: 'babel',
+      threads: 4,
+      loaders: ['babel-loader']
+    }),
     // 作用域提升
     new webpack.optimize.ModuleConcatenationPlugin(),
+    // 注意使用DLLPlugin时，入口需要时数组
     // new webpack.DllPlugin({
-    //   path: path.resolve(__dirname, '../dist/dll', 'manifest.json'),
+    //   // context: __dirname,
+    //   path: path.resolve(__dirname, '../dist/js/', '[name]-manifest.json'),
+    //   name: '[name]-[hash]'
     // }),
     // 根据模块的相对路径生成一个四位数的hash作为模块id，建议用于生产环境
     // 当供应商模块不变时，保持module.id稳定
@@ -105,7 +108,7 @@ const webpackConfig = merge(baseWebpackConfig, {
         uglifyOptions: {
           compress: {
             unused: true, 
-            // warnning: false,
+            warnings: false,
             drop_debugger: true
           },
           output: {
@@ -118,7 +121,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     splitChunks: {
       chunks: 'all',
       name: true,
-      minSize: 2000,
+      minSize: 20000,
       minChunks: 1,
       maxAsyncRequests: 5,
       maxInitialRequests: 3,
