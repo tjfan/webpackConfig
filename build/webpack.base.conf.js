@@ -26,11 +26,11 @@ htmlDirs.forEach(item => {
     filename:`./html/${item}.html`,
     template: path.join(config.htmlPath, `./${item}.html`),
     chunks: [item, 'default', 'vendors'],
-    // minify: process.env.NODE_ENV === 'development' ? false : {
-    //   removeAttributeQuotes: true,  // 去除属性引用
-    //   collapseWhitespace: true, // 折叠空白区域
-    //   removeComments: true  // 移除html中的注释
-    // }
+    minify: process.env.NODE_ENV === 'development' ? false : {
+      removeAttributeQuotes: true,  // 去除属性引用
+      collapseWhitespace: true, // 折叠空白区域
+      removeComments: true  // 移除html中的注释
+    },
     minify: {
       removeAttributeQuotes: true,  // 去除属性引用
       // collapseWhitespace: true, // 折叠空白区域
