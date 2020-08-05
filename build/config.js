@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const path = require('path');
 const utils = require('./utils');
@@ -18,7 +18,7 @@ const config = {
     useESlint: false,
     showESlintErrorInOverlay: false,
     devSourceMap: false,
-    devtool: 'eval-source-map',
+    devtool: 'cheap-module-eval-source-map',
     assetsPublicPath: '/',
     proxyTable: {
       '/api': 'http://localhost: 8080'
@@ -26,11 +26,12 @@ const config = {
   },
 
   build: {
+    index: path.resolve(__dirname, '../dist/index.html'),
     prodSourceMap: false,
-    devtool: 'source-map',
+    devtool: 'cheap-module-source-map',
     assetsRoot: path.resolve(__dirname, '../dist'),  // 构建根目录
-    assetsPublicPath: '/'  // 相对于服务器根目录的路径，用于加载构建好的资源
+    assetsPublicPath: '/',  // 相对于服务器根目录的路径，用于加载构建好的资源
   }
 }
 
-module.exports = config
+module.exports = config;

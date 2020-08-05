@@ -4,13 +4,14 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.base.conf');  // 引入基础配置
 const config = require('./config');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
   devtool: config.dev.devtool,  // 开启sourceMap,生产环境下不使用
   devServer: {
-    contentBase: './src/',
+    contentBase: '../dist',
     open: false,
     host: config.dev.host,
     port: config.dev.port,
@@ -26,7 +27,7 @@ module.exports = merge(baseWebpackConfig, {
       rewrites: [
         {
           from: /\.*/,
-          to: path.posix.join(config.dev.assetsPublicPath, 'html/index.html')
+          to: path.posix.join(config.dev.assetsPublicPath, 'public/index.html')
         }
       ]
     },
@@ -40,12 +41,6 @@ module.exports = merge(baseWebpackConfig, {
         include: [config.srcPath],
         exclude: /node_modules/,
         use: [
-          // {
-          //   loader: 'style-loader',
-          //   options: {
-          //     publicPath: '../'
-          //   }
-          // },
           'style-loader',
           'css-loader',
           'postcss-loader',  // 开发环境中如果自动添加前缀，可能影响性能。只在生产环境中添加即可
@@ -55,14 +50,15 @@ module.exports = merge(baseWebpackConfig, {
     ]
   },
   plugins: [ 
-    new webpack.HotModuleReplacementPlugin(), // 启动热更新
     new webpack.NamedChunksPlugin(),
-    // new webpack.NameModulesPlugin(),  // 开启HMR时显示模块的相对路径，建议用于开发环境
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"development"'
-      }
+      'process.env.NODE_ENV': JSON.stringify('development')
     }),
-    new webpack.NoEmitOnErrorsPlugin()  // 在编译出现错误的时候，使用NoEmitOnErrorsPlugin来跳出输出阶段，这样可以确保输出资源不会包含错误
+    new HtmlWebpackPlugin({
+      filename: './public/index.html',
+      template: './public/index.html',
+      inject: true
+    }),
   ]
 })
