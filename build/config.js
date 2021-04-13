@@ -9,7 +9,6 @@ const config = {
   node_modulesPath: utils.resolve('/node_modules/'), //node_modules目录
   htmlPath: utils.resolve('/src/html/'), // html目录
   jsPath: utils.resolve('/src/js/'),  // js目录
-  // igonreJs: utils.resolve('/src/main/'),  // 没有入口js文件的目录
   assetsSubDirectory: utils.resolve('/src/static/'),  // 静态资源目录（不做第三方处理）
 
   dev: {

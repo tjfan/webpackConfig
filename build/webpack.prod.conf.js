@@ -1,13 +1,16 @@
 'use strict';
+const path = require('path');
 const webpack = require('webpack');
 const baseWebpackConfig = require('./webpack.base.conf'); // 基础配置
 const merge = require('webpack-merge');
 const config = require('./config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MyPlugin = require('./plugin/my-plugin');
 
 const webpackConfig = merge(baseWebpackConfig, {
-  devtool: config.build.devtool,
+  mode: 'production',
+  devtool: 'none',
   plugins: [
     new HtmlWebpackPlugin({
       filename: config.build.index,
@@ -17,12 +20,12 @@ const webpackConfig = merge(baseWebpackConfig, {
         removeComments: true,
         collapseWhitespace: true,
         removeAttributeQuotes: true
-      },
-      chunksSortMode: 'dependency'
+      }
     }),
-    // new CleanWebpackPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
+    // new CleanWebpackPlugin()
+    new MyPlugin({
+      outputpath: 'dist',
+      name: 'JSZIP'
     })
   ]
 })

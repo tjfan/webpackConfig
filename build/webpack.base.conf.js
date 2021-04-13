@@ -18,7 +18,7 @@ module.exports = {
     publicPath: config.build.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.css', '.json'],  // 自动补全文件的扩展名
+    extensions: ['.js', '.css', '.json', '.ts', '.vue'],  // 自动补全文件的扩展名
     alias: {
       '@': resolve('src')
     }
